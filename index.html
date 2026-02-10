@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ஆதார்-பான் இணைப்பு சரிபார்ப்பு - தாஸ் பொது சேவை மையம்</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 850px;
+            margin: 20px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #2E7D32, #4CAF50, #81C784);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .shop-name {
+            color: #2E7D32;
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .accreditation {
+            color: #D32F2F;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .tagline {
+            color: #666;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .instructions {
+            background: linear-gradient(to right, #e8f5e9, #f1f8e9);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 35px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .instructions h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #444;
+            font-size: 17px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 17px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .check-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .check-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .check-btn:active {
+            transform: translateY(0);
+        }
+        
+        .receipt-btn {
+            background: linear-gradient(to right, #2196F3, #1976D2);
+            color: white;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
+        
+        .receipt-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .receipt-btn:active {
+            transform: translateY(0);
+        }
+        
+        .pdf-btn {
+            background: linear-gradient(to right, #FF6F00, #E65100);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 111, 0, 0.3);
+        }
+        
+        .pdf-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 111, 0, 0.4);
+        }
+        
+        .pdf-btn:active {
+            transform: translateY(0);
+        }
+        
+        .receipt {
+            display: none;
+            margin-top: 40px;
+            border: 2px solid  #31a4f7;
+            padding: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            position: relative;
+            width: 100%;
+        }
+        
+        .receipt-header {
+            background: linear-gradient(to right, hsl(212, 79%, 62%), #31a4f7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .receipt-shop-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .receipt-accreditation {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .receipt-address {
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 3px;
+            color: #e3f2fo; /* Changed from default white to light blue */
+        }
+        
+        .receipt-phone {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .receipt-body {
+            padding: 25px;
+        }
+        
+        .receipt-title {
+            text-align: center;
+            font-size: 20px;
+            color:  #31a4f7;
+            margin-bottom: 20px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .receipt-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: #4CAF50;
+        }
+        
+        .receipt-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+            font-size: 14px;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .detail-label {
+            flex: 1;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            flex: 2;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .status-container {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .status-linked {
+            background: linear-gradient(to right, #d4edda, #c3e6cb);
+            border: 2px solid #155724;
+            color: #155724;
+        }
+        
+        .status-not-linked {
+            background: linear-gradient(to right, #f8d7da, #f5c6cb);
+            border: 2px solid #721c24;
+            color: #721c24;
+        }
+        
+        .status-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .status-text {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .status-message {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .receipt-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #ddd;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .thank-you {
+            font-size: 16px;
+            color: #2E7D32;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .watermark {
+            position: absolute;
+            opacity: 0.05;
+            font-size: 100px;
+            font-weight: bold;
+            color: #2E7D32;
+            transform: rotate(-30deg);
+            top: 35%;
+            left: 15%;
+            pointer-events: none;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .shop-name {
+                font-size: 26px;
+            }
+        }
+        
+        .masked-text {
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="shop-name">தாஸ் பொது சேவை மையம்</div>
+            <div class="accreditation">(மத்திய மாநில அரசு அங்கீகாரம் பெற்றது)</div>
+            <div class="tagline">ஆதார்-பான் கார்டு இணைப்பு சரிபார்ப்பு மையம்</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>வழிமுறைகள்:</h3>
+            <p>• உங்கள் பான் எண், ஆதார் எண் மற்றும் பெயரை உள்ளிடவும்</p>
+            <p>• "இணைப்பை சரிபார்" பொத்தான் கிளிக் செய்யவும்</p>
+            <p>• இணைப்பு நிலை காட்டப்படும்</p>
+            <p>• இரசீது பெற "இரசீது அச்சிடு" பொத்தான் கிளிக் செய்யவும்</p>
+            <p>• <strong>குறிப்பு:</strong> இரசீதில் ஆதார் மற்றும் பான் எண்களின் நடு எண்கள் பாதுகாப்பிற்காக மறைக்கப்படும்</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="pan">பான் எண்:</label>
+            <input type="text" id="pan" placeholder="பான் எண்ணை உள்ளிடவும் (10 எழுத்துக்கள்)" maxlength="10">
+        </div>
+        
+        <div class="form-group">
+            <label for="aadhaar">ஆதார் எண்:</label>
+            <input type="text" id="aadhaar" placeholder="ஆதார் எண்ணை உள்ளிடவும் (12 இலக்கங்கள்)" maxlength="12">
+        </div>
+        
+        <div class="form-group">
+            <label for="customerName">வாடிக்கையாளர் பெயர்:</label>
+            <input type="text" id="customerName" placeholder="உங்கள் முழுப் பெயரை உள்ளிடவும்">
+        </div>
+        
+        <div class="button-group">
+            <button class="check-btn" onclick="checkLinkage()">
+                <span>🔍</span> இணைப்பை சரிபார்
+            </button>
+            <button class="receipt-btn" onclick="generateReceipt()">
+                <span>🖨️</span> அச்சிடு
+            </button>
+            <button class="pdf-btn" onclick="savePDF()">
+                <span>📄</span> PDF சேமிக்க
+            </button>
+        </div>
+        
+        <div class="note">
+            <strong>குறிப்பு:</strong> இது ஒரு மாதிரி பயன்பாடு மட்டும். உண்மை சரிபார்ப்புக்கு அதிகாரப்பூர்வ வலைத்தளங்களை பயன்படுத்தவும்.
+        </div>
+        
+        <div id="receipt" class="receipt">
+            <div class="watermark">தாஸ்</div>
+            
+            <div class="receipt-header">
+                <div class="receipt-shop-name">தாஸ் பொது சேவை மையம்</div>
+                <div class="receipt-accreditation">(மத்திய மாநில அரசு அங்கீகாரம் பெற்றது)</div>
+                <div class="receipt-address">147எ, கிரேட் காட்டன் ரோடு,</div>
+                <div class="receipt-address">மத்திய பாகம் காவல் நிலையம் எதிரில்,</div>
+                <div class="receipt-address">தூத்துக்குடி-628001</div>
+                <div class="receipt-phone">செல்: 98 43 23 23 24 / 88 70 23 23 32</div>
+            </div>
+            
+            <div class="receipt-body">
+                <div class="receipt-title">ஆதார்-பான் இணைப்பு சரிபார்ப்பு இரசீது</div>
+                
+                <div class="receipt-details">
+                    <div class="detail-row">
+                        <div class="detail-label">பரிவர்த்தனை எண்:</div>
+                        <div class="detail-value" id="txnId">TXN20240001</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">தேதி:</div>
+                        <div class="detail-value" id="currentDate"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">நேரம்:</div>
+                        <div class="detail-value" id="currentTime"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">வாடிக்கையாளர் பெயர்:</div>
+                        <div class="detail-value" id="receiptCustomerName"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">பான் எண்:</div>
+                        <div class="detail-value" id="receiptPan" class="masked-text"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">ஆதார் எண்:</div>
+                        <div class="detail-value" id="receiptAadhaar" class="masked-text"></div>
+                    </div>
+                </div>
+                
+                <div id="statusDisplay" class="status-container">
+                    <!-- இணைப்பு நிலை இங்கே காட்டப்படும் -->
+                </div>
+                
+                <div class="receipt-footer">
+                    <div class="thank-you">தங்கள் வருகைக்கு நன்றி!</div>
+                    <div>இந்த இரசீது கணினி மூலம் உருவாக்கப்பட்டது</div>
+                    <div>மேல்முறையீடு: 9843232324 / 8870232332</div>
+                    <div>வலைத்தளம்: https://dhasscsc.github.io/online_service/</div>
+                    <div style="margin-top: 10px; font-style: italic; color: #777;">
+                        <small>பாதுகாப்பு காரணங்களுக்காக ஆதார் மற்றும் பான் எண்களின் நடு எண்கள் மறைக்கப்பட்டுள்ளன</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            
+            const date = now.toLocaleDateString('ta-IN', dateOptions);
+            const time = now.toLocaleTimeString('ta-IN', timeOptions);
+            
+            document.getElementById('currentDate').textContent = date;
+            document.getElementById('currentTime').textContent = time;
+            
+            const txnId = 'TXN' + now.getFullYear() + 
+                         String(now.getMonth() + 1).padStart(2, '0') +
+                         String(now.getDate()).padStart(2, '0') +
+                         String(now.getHours()).padStart(2, '0') +
+                         String(now.getMinutes()).padStart(2, '0') +
+                         String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('txnId').textContent = txnId;
+        }
+        
+        // பான் எண்ணை மறைக்கும் செயல்பாடு
+        function maskPAN(pan) {
+            if (pan.length !== 10) return pan;
+            // முதல் 3 எழுத்துக்கள் காட்டவும், அடுத்த 4 எழுத்துக்களை XXXX ஆக மறைக்கவும், கடைசி 3 எழுத்துக்கள் காட்டவும்
+            return pan.substring(0, 3) + 'XXXX' + pan.substring(7);
+        }
+        
+        // ஆதார் எண்ணை மறைக்கும் செயல்பாடு
+        function maskAadhaar(aadhaar) {
+            if (aadhaar.length !== 12) return aadhaar;
+            // 4-4 எண்களாக பிரித்து, நடுவிலுள்ள 4 எண்களை மறைக்கவும்
+            const part1 = aadhaar.substring(0, 4);
+            const part2 = 'XXXX';
+            const part3 = aadhaar.substring(8);
+            return part1 + ' ' + part2 + ' ' + part3;
+        }
+        
+        function checkLinkage() {
+            const pan = document.getElementById('pan').value.trim().toUpperCase();
+            const aadhaar = document.getElementById('aadhaar').value.trim();
+            const customerName = document.getElementById('customerName').value.trim();
+            
+            if (!pan || !aadhaar || !customerName) {
+                alert('தயவு செய்து பான் எண், ஆதார் எண் மற்றும் பெயரை உள்ளிடவும்');
+                return;
+            }
+            
+            if (pan.length !== 10 || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
+                alert('சரியான 10-எழுத்து பான் எண்ணை உள்ளிடவும் (எ.கா: ABCDE1234F)');
+                return;
+            }
+            
+            if (aadhaar.length !== 12 || !/^\d+$/.test(aadhaar)) {
+                alert('சரியான 12-இலக்க ஆதார் எண்ணை உள்ளிடவும்');
+                return;
+            }
+            
+            simulateAPICall(pan, aadhaar, customerName);
+        }
+        
+        function simulateAPICall(pan, aadhaar, customerName) {
+            const isLinked = Math.random() > 0.5;
+            const linkageDate = isLinked ? 'XX-XX-2026' : 'இணைக்கப்படவிலையை';
+            const lastVerified = new Date().toLocaleDateString('ta-IN');
+            
+            const receiptPan = document.getElementById('receiptPan');
+            const receiptAadhaar = document.getElementById('receiptAadhaar');
+            const receiptCustomerName = document.getElementById('receiptCustomerName');
+            
+            // பான் எண்ணை மறைக்கவும்
+            const maskedPAN = maskPAN(pan);
+            receiptPan.textContent = maskedPAN;
+            
+            // ஆதார் எண்ணை மறைக்கவும்
+            const maskedAadhaar = maskAadhaar(aadhaar);
+            receiptAadhaar.textContent = maskedAadhaar;
+            
+            receiptCustomerName.textContent = customerName;
+            
+            const statusDisplay = document.getElementById('statusDisplay');
+            
+            if (isLinked) {
+                statusDisplay.innerHTML = `
+                    <div class="status-icon">✅</div>
+                    <div class="status-text">ஆதார் கார்டு மற்றும் பான் கார்டு இணைந்துள்ளது</div>
+                    <div class="status-message">இணைப்பு தேதி: ${linkageDate} | கடைசி சரிபார்ப்பு: ${lastVerified}</div>
+                `;
+                statusDisplay.className = 'status-container status-linked';
+            } else {
+                statusDisplay.innerHTML = `
+                    <div class="status-icon">❌</div>
+                    <div class="status-text">ஆதார் கார்டு மற்றும் பான் கார்டு இணையவிலையை</div>
+                    <div class="status-message">தாமத கட்டணம் செலுத்தி உங்கள் ஆதார்-பான் கார்டை இணைக்கவும்</div>
+                `;
+                statusDisplay.className = 'status-container status-not-linked';
+            }
+            
+            updateDateTime();
+            document.getElementById('receipt').style.display = 'block';
+            document.getElementById('receipt').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function generateReceipt() {
+            const pan = document.getElementById('pan').value.trim();
+            const aadhaar = document.getElementById('aadhaar').value.trim();
+            const customerName = document.getElementById('customerName').value.trim();
+            
+            if (!pan || !aadhaar || !customerName) {
+                alert('முதலில் பான், ஆதார் எண் மற்றும் பெயரை உள்ளிட்டு இணைப்பை சரிபார்க்கவும்');
+                return;
+            }
+            
+            document.getElementById('receipt').style.display = 'block';
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        function savePDF() {
+            const pan = document.getElementById('pan').value.trim();
+            const aadhaar = document.getElementById('aadhaar').value.trim();
+            const customerName = document.getElementById('customerName').value.trim();
+            
+            if (!pan || !aadhaar || !customerName) {
+                alert('முதலில் பான், ஆதார் எண் மற்றும் பெயரை உள்ளிட்டு இணைப்பை சரிபார்க்கவும்');
+                return;
+            }
+            
+            const receiptElement = document.getElementById('receipt');
+            if (receiptElement.style.display === 'none') {
+                alert('முதலில் இணைப்பை சரிபார்க்கவும்');
+                return;
+            }
+            
+            // PDF ஐ உருவாக்கவும்
+            html2canvas(receiptElement, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a5');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 148;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                const fileName = `AADHAAR-PAN-${new Date().getTime()}.pdf`;
+                pdf.save(fileName);
+            }).catch(err => {
+                console.error('PDF உருவாக்கல் பிழை:', err);
+                alert('PDF உருவாக்கல் பிழை ஏற்பட்டது. தயவு செய்து மீண்டும் முயற்சி செய்யவும்။');
+            });
+        }
+        
+        window.onload = function() {
+            updateDateTime();
+            
+            document.getElementById('pan').addEventListener('input', function(e) {
+                this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (this.value.length > 10) {
+                    this.value = this.value.substring(0, 10);
+                }
+            });
+            
+            document.getElementById('aadhaar').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+                if (this.value.length > 12) {
+                    this.value = this.value.substring(0, 12);
+                }
+            });
+            
+            document.getElementById('pan').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkLinkage();
+                }
+            });
+            
+            window.addEventListener('afterprint', function() {
+                document.getElementById('receipt').style.display = 'none';
+            });
+        };
+    </script>
+</body>
+</html>
